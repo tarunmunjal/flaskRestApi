@@ -1,27 +1,34 @@
-import argparse
+import argparse, os
 from flask import Flask, request, Response, json
 from flask_restful import Resource, Api, reqparse
 from flaskext.mysql import MySQL
 
-__parserParams = argparse.ArgumentParser(description="RestApi")
-__parserParams.add_argument('--Port','-P',help='Port to run the application on',required=True)
-__parserParams.add_argument('--DBServer','-dB',help='Database Server IP/hostname',required=True)
-__parserParams.add_argument('--DBUser','-dBu',help='Database user',required=True)
-__parserParams.add_argument('--DBPassword','-dBp',help='Database password',required=True)
-__parserParams.add_argument('--DBName','-dBN',help='Database to connect to',required=True)
+#__parserParams = argparse.ArgumentParser(description="RestApi")
+#__parserParams.add_argument('--port','-p',help='Port to run the application on',required=True)
+#__parserParams.add_argument('--dbserver','-dbs',help='Database Server IP/hostname',required=True)
+#__parserParams.add_argument('--dbuser','-dbu',help='Database user',required=True)
+#__parserParams.add_argument('--dbpassword','-dbp',help='Database password',required=True)
+#__parserParams.add_argument('--dbname','-dbn',help='Database to connect to',required=True)
 
-__allParameters = __parserParams.parse_args()
-__applicationPort = __allParameters.Port
-
-
+#__allParameters = __parserParams.parse_args()
+#__applicationPort = __allParameters.port
+#if os.environ['env_port'] and os.environ['env_dbuser'] and os.environ['env_dbpassword'] and os.environ['env_dbname'] and os.environ['env_dbserver']:
+#    print('envfound')
+#else:
+#    raise Exception('port,dbuser,dbpassword,dbname,dbserver are required params')    
+__applicationPort = int(os.environ['env_port'])
 app = Flask(__name__)
 mysql = MySQL()
 ######## Database variables
-app.config['MYSQL_DATABASE_USER'] = __allParameters.DBUser
-app.config['MYSQL_DATABASE_PASSWORD'] = __allParameters.DBPassword
-app.config['MYSQL_DATABASE_DB'] = __allParameters.DBName
-app.config['MYSQL_DATABASE_HOST'] = __allParameters.DBServer
+#app.config['MYSQL_DATABASE_USER'] = __allParameters.dbuser
+#app.config['MYSQL_DATABASE_PASSWORD'] = __allParameters.dbpassword
+#app.config['MYSQL_DATABASE_DB'] = __allParameters.dbname
+#app.config['MYSQL_DATABASE_HOST'] = __allParameters.dbserver
 
+app.config['MYSQL_DATABASE_USER'] = os.environ['env_dbuser']
+app.config['MYSQL_DATABASE_PASSWORD'] = os.environ['env_dbpassword']
+app.config['MYSQL_DATABASE_DB'] = os.environ['env_dbname']
+app.config['MYSQL_DATABASE_HOST'] = os.environ['env_dbserver']
 
 mysql.init_app(app)
 
@@ -121,4 +128,4 @@ def testuserselectname(name):
     return json.dumps(queryResult)
 
 if __name__ == '__main__':
-    app.run(port=__applicationPort)
+    app.run(host='0.0.0.0',port=__applicationPort)
